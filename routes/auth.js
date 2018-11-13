@@ -50,10 +50,10 @@ router.post('/signin', (req, res) => {
   const password = req.body.password; 
 
   firebaseAuth.signInWithEmailAndPassword(email, password)
-    .then((user) => {
-      req.session.uid = user;
+    .then((result) => {
+      req.session.uid = result.user.uid;
       req.session.email = req.body.email;
-      console.log('session', req.session);
+      console.log('session', req.session.uid);
       res.redirect('/dashboard');
     })
     .catch((error) => {
