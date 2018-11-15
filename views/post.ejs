@@ -1,8 +1,8 @@
 <% extend('./layouts/layout.ejs') %>
   <div class="hex-blog">
     <nav class="breadcrumb pl-0">
-      <a class="breadcrumb-item text-primary" href="#">Home</a>
-      <a class="breadcrumb-item text-primary" href="#">
+      <a class="breadcrumb-item text-primary" href="/">Home</a>
+      <a class="breadcrumb-item text-primary" href="/archives/<%- categories[article.category].path %>">
 
         <%- categories[article.category].name %>
 

@@ -86,6 +86,7 @@ router.get('/post/:id', function (req, res, next) {
     res.render('post', {
       title: 'Express',
       categories,
+      categoryId: '',
       article,
       monent
     });
