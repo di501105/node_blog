@@ -8,7 +8,7 @@
     <div class="btn-group w-100">
       <a href="/dashboard/archives?status=public" class="btn btn-outline-secondary w-100 rounded-0 <% if (status === 'public') { %> active <% } %>">已發佈</a>
       <a href="/dashboard/archives?status=draft" class="btn btn-outline-secondary w-100 rounded-0 <% if (status === 'draft') { %> active <% } %>">草稿</a>
-      <a href="article.html" class="btn btn-primary">新增文章</a>
+      <a href="/dashboard/article/create" class="btn btn-primary">新增文章</a>
     </div>
 
     <% for (prop in articles) { %>
@@ -44,29 +44,7 @@
 </div>
 
 
-<nav class="my-5" aria-label="Page navigation example">
-  <ul class="pagination justify-content-center">
-    <li class="page-item disabled">
-      <a class="page-link" href="/dashboard/archives" tabindex="-1">Previous</a>
-    </li>
-    
-      <li class="page-item active"> 
-        <a class="page-link" href="/dashboard/archives">
-          1
-        </a>
-      </li>
-    
-      <li class="page-item "> 
-        <a class="page-link" href="/dashboard/archives">
-          2
-        </a>
-      </li>
-    
-    <li class="page-item ">
-      <a class="page-link" href="/dashboard/archives">Next</a>
-    </li>
-  </ul>
-</nav>
+<%- include('../partials/pagination') %>
 
 
 

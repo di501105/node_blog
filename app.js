@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var session = require('express-session');
 var flash = require('connect-flash');
+require('dotenv').config();
 
 var indexRouter = require('./routes/index');
 var dashboardRouter = require('./routes/dashboard');
@@ -33,7 +34,7 @@ app.use(flash());
 
 const authCheck = function (req, res, next) {
   console.log('middleware', req.session);
-  if (req.session.uid) {
+  if (req.session.uid === process.env.ADMIN_UID) {
     return next();
   } else {
     return res.redirect('/auth/signin');
@@ -46,7 +47,7 @@ app.use('/auth', auth);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  next(createError(404));
+  next(createError(404, '您所查看的頁面不存在:('));
 });
 
 // error handler

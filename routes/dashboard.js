@@ -3,42 +3,53 @@ const router = express.Router();
 const striptags = require('striptags');
 const monent = require('moment');
 const firebaseAdminDb = require('../connections/firebase_admin');
+const pagination = require('../modules/pagination');
+const firebaseSort = require('../modules/firebaseSort');
 
 const categoriesRef = firebaseAdminDb.ref('/categories/');
-const articlesRef = firebaseAdminDb.ref('/articles');
+const articlesRef = firebaseAdminDb.ref('/articles/');
 
 router.get('/', (req, res) => {
   const messages = req.flash('error');
   res.render('dashboard/index', {
     title: 'Express',
     currentPath: '/',
-    hasErrors: messages.length > 0,
+    hasInfo: messages.length > 0,
   });
 });
 
 router.get('/archives', function (req, res, next) {
+  const messages = req.flash('error');
   const status = req.query.status || 'public';
-  console.log(status);
+  const currentPage = Number.parseInt(req.query.page) || 1;
+  // console.log(status);
   let categories = {};
   categoriesRef.once('value').then((snapshot) => {
     categories = snapshot.val();
     return articlesRef.orderByChild('update_time').once('value');
   }).then((snapshot) => {
-    const articles = [];
-    snapshot.forEach((snapshotChild) => {
-      // console.log(snapshotChild.val());
-      if (status === snapshotChild.val().status) {
-        articles.push(snapshotChild.val());
-      }
-    });
-    articles.reverse();
+    // const articles = [];
+    // snapshot.forEach((snapshotChild) => {
+    //   // console.log(snapshotChild.val());
+    //   if (status === snapshotChild.val().status) {
+    //     articles.push(snapshotChild.val());
+    //   }
+    // });
+    // articles.reverse();
+
+    const sortData = firebaseSort.byData(snapshot, 'status', status);
+    const data = pagination(sortData, currentPage, `/dashboard/archives`);
+
     res.render('dashboard/archives', {
       title: 'Express',
-      articles,
+      articles: data.data,
+      page: data.page,
+      messages,
       categories,
       striptags,
       monent,
-      status
+      status,
+      hasInfo: messages.length > 0
     });
   });
 });
@@ -82,7 +93,7 @@ router.get('/categories', function (req, res, next) {
       messages,
       hasInfo: messages.length > 0,
       categories
-      });
+    });
   });
 });
 

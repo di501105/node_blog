@@ -1,12 +1,15 @@
+const createError = require('http-errors');
 const express = require('express');
 const router = express.Router();
 const striptags = require('striptags');
 const monent = require('moment');
 const pagination = require('../modules/pagination');
 const firebaseAdminDb = require('../connections/firebase_admin');
+const firebaseSort = require('../modules/firebaseSort');
 
 const categoriesRef = firebaseAdminDb.ref('/categories/');
-const articlesRef = firebaseAdminDb.ref('/articles');
+const articlesRef = firebaseAdminDb.ref('/articles/');
+
 
 
 /* GET home page. */
@@ -15,24 +18,49 @@ router.get('/', function (req, res, next) {
   let categories = {};
   categoriesRef.once('value').then((snapshot) => {
     categories = snapshot.val();
+    console.log(categories);
     return articlesRef.orderByChild('update_time').once('value');
   }).then((snapshot) => {
-    const articles = [];
+    const sortData = firebaseSort.byData(snapshot, 'status', 'public');
+    const data = pagination(sortData, currentPage);
+  
+    // console.log(data);
+    res.render('index', {
+      title: 'Express',
+      articles: data.data,
+      page: data.page,
+      categoryId: '',
+      categories,
+      striptags,
+      monent,
+    });
+  });  
+});
+
+router.get('/:category', function (req, res, next) {
+  const currentPage = Number.parseInt(req.query.page) || 1;
+  const categoryPath = req.param('category');
+  let categories = {};
+  let categoryId = '';
+  categoriesRef.once('value').then((snapshot) => {
+    categories = snapshot.val();
     snapshot.forEach((snapshotChild) => {
       // console.log(snapshotChild.val());
-      if ('public' === snapshotChild.val().status) {
-        articles.push(snapshotChild.val());
+      if (categoryPath === snapshotChild.val().path) {
+        categoryId = snapshotChild.val().id;
       }
     });
-    articles.reverse();
-    const data = pagination(articles, currentPage);
-    // console.log(data);
+    return articlesRef.orderByChild('update_time').once('value');
+  }).then((snapshot) => {
+    const sortData = firebaseSort.byData(snapshot, 'category', categoryId);
+    const data = pagination(sortData, currentPage, `/${categoryPath}`);
 
     res.render('index', {
       title: 'Express',
       articles: data.data,
       page: data.page,
       categories,
+      categoryId,
       striptags,
       monent,
     });
@@ -49,6 +77,12 @@ router.get('/post/:id', function (req, res, next) {
   }).then((snapshot) => {
     const article = snapshot.val();
     console.log(article);
+    if (!article) {
+      // return res.render('error', {
+      //   message: '找不到該文章'
+      // });
+      return next(createError(404, '找不到該文章:('));
+    }
     res.render('post', {
       title: 'Express',
       categories,

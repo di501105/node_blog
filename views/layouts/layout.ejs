@@ -34,7 +34,12 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav ml-auto">
-      <a class="nav-item nav-link" href="#">心得 <span class="sr-only">(current)</span></a>
+      <% var categories = categories || {} %>
+      <% for (prop in categories) { %>
+        <% if (categories.hasOwnProperty(prop)) { %>
+        <a class="nav-item nav-link <% if (categories[prop].id === categoryId) { %> <%- 'active' %> <% } %>" href="/<%- categories[prop].path %>"> <%- categories[prop].name %> <span class="sr-only">(current)</span></a>
+        <% } %>
+      <% } %>
     </div>
   </div>
 </nav>
