@@ -25,7 +25,7 @@ router.get('/', function (req, res, next) {
     const data = pagination(sortData, currentPage);
   
     // console.log(data);
-    res.render('index', {
+    res.render('archives', {
       title: 'Express',
       articles: data.data,
       page: data.page,
@@ -37,7 +37,7 @@ router.get('/', function (req, res, next) {
   });  
 });
 
-router.get('/:category', function (req, res, next) {
+router.get('/archives/:category', function (req, res, next) {
   const currentPage = Number.parseInt(req.query.page) || 1;
   const categoryPath = req.param('category');
   let categories = {};
@@ -53,9 +53,9 @@ router.get('/:category', function (req, res, next) {
     return articlesRef.orderByChild('update_time').once('value');
   }).then((snapshot) => {
     const sortData = firebaseSort.byData(snapshot, 'category', categoryId);
-    const data = pagination(sortData, currentPage, `/${categoryPath}`);
+    const data = pagination(sortData, currentPage, `archives/${categoryPath}`);
 
-    res.render('index', {
+    res.render('archives', {
       title: 'Express',
       articles: data.data,
       page: data.page,

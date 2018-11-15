@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
   });
 });
 
-router.get('/archives', function (req, res, next) {
+router.get('/archives/', function (req, res, next) {
   const messages = req.flash('error');
   const status = req.query.status || 'public';
   const currentPage = Number.parseInt(req.query.page) || 1;
@@ -38,7 +38,7 @@ router.get('/archives', function (req, res, next) {
     // articles.reverse();
 
     const sortData = firebaseSort.byData(snapshot, 'status', status);
-    const data = pagination(sortData, currentPage, `/dashboard/archives`);
+    const data = pagination(sortData, currentPage, `dashboard/archives`);
 
     res.render('dashboard/archives', {
       title: 'Express',
@@ -98,7 +98,7 @@ router.get('/categories', function (req, res, next) {
 });
 
 
-
+//文章管理
 router.post('/article/create', (req, res) => {
   // console.log(req.body);
   const data = req.body;
@@ -130,6 +130,42 @@ router.post('/article/delete/:id', (req, res) => {
   res.end();
 });
 
+
+//標籤管理
+router.post('/api/tag/create', (req, res) => {
+  const data = req.body;
+  const tagRef = tagRef.push();
+  tagRef.orderByChild('name').equalTo(data.name).once('value').then((snapshot) => {
+    if (snapshot.val() !== null) {
+      res.send({
+        success: false,
+        message: '已有相同的值',
+      });
+      res.end();
+    } else {
+      tagRef.set(data).then((response) => {
+        res.send({
+          success: true,
+          data: response,
+        });
+        res.end();
+      });
+    }
+  });
+});
+
+router.get('/api/tags', function (req, res) {
+  tagRef.once('value').then((snapshot) => {
+    const tags = snapshot.val();
+    // console.log('categories', categories);
+    res.send({
+      success: true,
+      data: tags,
+    });
+  });
+});
+
+//分類管理
 router.post('/categories/create', (req, res) => {
   const data = req.body;
   console.log(data);
@@ -148,6 +184,7 @@ router.post('/categories/create', (req, res) => {
   });
 });
 
+//Delete
 router.post('/categories/delete/:id', (req, res) => {
   const id = req.param('id');
   categoriesRef.child(id).remove();

@@ -11,7 +11,7 @@
           <div class="d-flex flex-row text-secondary small">
             <div class="p-2"><span class="fa fa-clock-o"></span> <%- monent(articles[prop].update_time * 1000).format('YYYY/MM/DD') %></div>
             <div class="p-2"><i class="fa fa-tag" aria-hidden="true"></i>
-              <a href="#" class="text-info">
+              <a href="/<%- categories[articles[prop].category].path %>" class="text-info">
                 <% if (categories.hasOwnProperty(articles[prop].category)) { %>
                 <%- categories[articles[prop].category].name %>
                 <% } else { %>
@@ -25,6 +25,9 @@
           </div>
         </div>
       </div>
+    <% } %>
+    <% if (!articles.length) { %>
+      <h2>該分類沒有文章</h2>
     <% } %>
   </div>
 </div>
